@@ -30,7 +30,7 @@ def get_bday(person):
 
     person_data = get_person_data(person)
 
-    date = person_data.get('DATE OF BIRTH', '')
+    date = person_data.get('birth_date', '')
 
     bday = convert_bday_str_to_date(date)
 
@@ -51,7 +51,6 @@ def get_person_data(person):
         'continue' : '',
         'redirects' : '' #necessary to automatically resolve redirects
     }
-
     
     url = 'http://en.wikipedia.org/w/api.php' 
 
@@ -83,21 +82,49 @@ def get_person_data(person):
 def parse_person_data(markup):
     """Parse a wikipedia article and return a dictionary of Persondata"""
 
-    start = markup.find('{{Persondata')
-    if start == -1:
-        raise NoPersonDataException('No {{Persondata ... }} item')
-
-    end = markup.find('}}', start) - 1
+    infobox = extract_infobox(markup)
 
     person_data = {}
-    for item in markup[start : end].split('\n'):
-        matches = re.search(r"^\s*\|(.*)=(.*)$", item)
+    for item in infobox.split('\n'):
+        matches = re.search(r"^\s*\|(.*?)\s*=(.*)$", item)
         if matches:
             key, value = [val.strip() for val in matches.groups()]
             if key and value:
                 person_data[unescape_html(key)] = unescape_html(value)
+                #person_data[key] = value
 
+    #import pprint; pprint.pprint(person_data)
     return person_data
+
+def extract_infobox(string):
+    start = find_infobox_start(string)
+    end = find_infobox_end(string[start:])
+    return string[start:end]
+
+def find_infobox_start(string):
+    infobox = "{{Infobox "
+    start = string.find(infobox)
+
+    if start == -1:
+        raise NoPersonDataException('No %s item' % infobox)
+
+    return start
+
+def find_infobox_end(string):
+    if string[:2] != '{{':
+        raise NoPersonDataException('Malformed input to find_infobox_end' % infobox)
+
+    stack = []
+    for match in re.finditer(r"({{|}})", string):
+        s = match.group(1)
+        if s == '{{':
+            stack.append(s)
+        elif s == '}}':
+            stack.pop()
+            if len(stack) == 0:
+                return match.end()
+
+    raise NoPersonDataException('Malformed input to find_infobox_end' % infobox)
 
 def get_name_path(string):
     """Convert a person name string into a wikipedia path"""
@@ -108,12 +135,18 @@ def get_name_path(string):
             capitalized_words.append(capwords(name, '.'))
         elif name.find('-') != -1:
             capitalized_words.append(capwords(name, '-'))
+        elif is_roman_numeral(name):
+            capitalized_words.append(name.upper())
         else:
             capitalized_words.append(name.capitalize())
 
     string = '_'.join(capitalized_words)
     return string
     #return quote(string.encode('utf-8'))
+
+def is_roman_numeral(string):
+    roman_nums = "ivxlcdm"
+    return all(c in roman_nums for c in string)
 
 def convert_bday_str_to_date(bday_string):
     """Extract year, month, day from date string"""
@@ -124,6 +157,39 @@ def convert_bday_str_to_date(bday_string):
         err_str = 'Could not parse date from "%s"' % bday_string
         raise NoBirthdayException(err_str)
 
+    bday_string = re.sub("<.*>", "", bday_string)
+
+    date = parse_standard_date(bday_string)
+
+    if not date:
+        date = parse_nonstandard_date(bday_string)
+
+    if not date:
+        raise NoBirthdayException
+
+    return date
+
+def parse_standard_date(bday_string):
+    match = re.match("^\{\{(.*)\}\}$", bday_string)
+
+    if not match:
+        return
+
+    bday_string = match.group(1)
+        
+    def is_int(n):
+        try:
+            int(n)
+            return True
+        except ValueError:
+            return False
+
+    date = filter(is_int, bday_string.split('|'))
+    date = tuple(map(int, date))
+        
+    return date
+
+def parse_nonstandard_date(bday_string):
     regex = {
         #'2001-01-15'
         (r"^(\d{4})-(\d{2})-(\d{2})$", ('year', 'month', 'day')),
@@ -138,7 +204,8 @@ def convert_bday_str_to_date(bday_string):
         (r"^(\w+),\s+(\d+)\s+(\bBC\b|\bAD\b)?$", ('monthStr', 'year', 'bc')),
 
         #c. 2001 BC
-        (r"^(c\.)?\s*([0-9]+)\s*(\bBC\b|\bAD\b)?$", ('_', 'year', 'bc')),
+        #likely 2001 BC
+        (r"^(c\.|likely)?\s*([0-9]+)\s*(\bBC\b|\bAD\b)?$", ('_', 'year', 'bc')),
 
         #2001st cenutury BC
         (r"^([0-9])+..\s+century\s*(\bBC\b|\bAD\b)?$", ('century', 'bc'))
@@ -153,9 +220,6 @@ def convert_bday_str_to_date(bday_string):
 
             print 'hit: "%s" "%s"' % (expr,  repr(matches.groups()))
             date = create_date_from_matches(matches_dict)
-
-    if not date:
-        raise NoBirthdayException
 
     return date
 
@@ -206,7 +270,10 @@ def unescape_html(html):
     """Unescape whitespace in html string"""
 
     soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
-    return soup.string.replace(u'\xa0', ' ')
+    if soup.string:
+        return soup.string.replace(u'\xa0', ' ')
+    else:
+        return html
 
 def month_to_int(month):
     """Convert month string to integer [1-12]"""

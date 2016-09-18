@@ -28,8 +28,8 @@ def age(request):
 
 def getCelebObj(name):
     try:
-        birthdate = celeb_age.getBDay(name)
-        ageStr, nDays = getAgeInfo(birthdate)
+        birthdate = celeb_age.get_bday(name)
+        ageStr, nDays = get_age_info(birthdate)
     except (celeb_age.NoPersonDataException, celeb_age.NoWikiEntryException, celeb_age.NoBirthdayException):
         ageStr = '?'
         nDays = 0
@@ -40,7 +40,7 @@ def getCelebObj(name):
         'nDays': nDays
     }
 
-def getAgeInfo(birthdate):
+def get_age_info(birthdate):
     now = getNow()
     days =  nDays(now) - nDays(birthdate)
 

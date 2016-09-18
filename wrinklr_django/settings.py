@@ -24,7 +24,7 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 
 # Allow all host headers
-ALLOWED_HOSTS = ['wrinklr.herokuapp.com']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
