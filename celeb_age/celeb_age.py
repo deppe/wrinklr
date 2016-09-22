@@ -86,7 +86,7 @@ def parse_person_data(markup):
 
     person_data = {}
     for item in infobox.split('\n'):
-        matches = re.search(r"^\s*\|(.*?)\s*=(.*)$", item)
+        matches = re.search(r"^\s*\|\s*(.*?)\s*=(.*)$", item)
         if matches:
             key, value = [val.strip() for val in matches.groups()]
             if key and value:
@@ -99,7 +99,7 @@ def parse_person_data(markup):
 def extract_infobox(string):
     start = find_infobox_start(string)
     end = find_infobox_end(string[start:])
-    return string[start:end]
+    return string[start:start + end]
 
 def find_infobox_start(string):
     infobox = "{{Infobox "
