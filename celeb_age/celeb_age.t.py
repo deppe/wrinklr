@@ -28,6 +28,7 @@ class TestCelebAge(unittest.TestCase):
         self.assertEqual((1920,  5, 18), age('pope john paul ii'))
         self.assertEqual((1927,  4, 16), age('pope benedict xvi'))
         self.assertEqual((1964,  9,  2), age('keanu reeves'))
+        self.assertEqual((1412,   1,  6), age('joan of arc'))
 
     def test_bad_ages(self):
         """Test celeb_age.get_bday bad input"""

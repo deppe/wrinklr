@@ -190,6 +190,8 @@ def parse_standard_date(bday_string):
     return date
 
 def parse_nonstandard_date(bday_string):
+    bday_string = re.sub(r"(c\.|likely)", "", bday_string, flags=re.IGNORECASE).strip()
+
     regex = {
         #'2001-01-15'
         (r"^(\d{4})-(\d{2})-(\d{2})$", ('year', 'month', 'day')),
@@ -205,7 +207,7 @@ def parse_nonstandard_date(bday_string):
 
         #c. 2001 BC
         #likely 2001 BC
-        (r"^(c\.|likely)?\s*([0-9]+)\s*(\bBC\b|\bAD\b)?$", ('_', 'year', 'bc')),
+        (r"^([0-9]+)\s*(\bBC\b|\bAD\b)?$", ('year', 'bc')),
 
         #2001st cenutury BC
         (r"^([0-9])+..\s+century\s*(\bBC\b|\bAD\b)?$", ('century', 'bc'))
