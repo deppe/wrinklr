@@ -1,12 +1,10 @@
 """Test driver for celeb_age.py"""
 # coding=utf-8
 
-from __future__ import unicode_literals
-
 import requests
 import re
 from string import capwords
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 #from urllib2 import quote
 
 class CelebAgeException(Exception):
@@ -58,7 +56,7 @@ def get_person_data(person):
     result = requests.get(url, params=request)
 
     final_url = result.url
-    print 'Requested data from %s' % final_url
+    print('Requested data from %s' % final_url)
 
     result = result.json()
 
@@ -66,9 +64,9 @@ def get_person_data(person):
         raise CelebAgeException(result['error'])
 
     if 'warnings' in result: 
-        print result['warnings']
+        print(result['warnings'])
 
-    for page in result['query']['pages'].itervalues():
+    for page in result['query']['pages'].values():
         try:
             page_data = page['revisions'][0]['*']
         except KeyError:
@@ -151,7 +149,7 @@ def is_roman_numeral(string):
 def convert_bday_str_to_date(bday_string):
     """Extract year, month, day from date string"""
 
-    print 'parsing date string: "%s"' % bday_string
+    print('parsing date string: "%s"' % bday_string)
 
     if not bday_string:
         err_str = 'Could not parse date from "%s"' % bday_string
@@ -220,7 +218,7 @@ def parse_nonstandard_date(bday_string):
         if matches:
             matches_dict = dict(zip(groups, matches.groups()))
 
-            print 'hit: "%s" "%s"' % (expr,  repr(matches.groups()))
+            print('hit: "%s" "%s"' % (expr,  repr(matches.groups())))
             date = create_date_from_matches(matches_dict)
 
     return date
@@ -271,7 +269,8 @@ def get_year(matches):
 def unescape_html(html):
     """Unescape whitespace in html string"""
 
-    soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
+    soup = BeautifulSoup(html, "html.parser")
+
     if soup.string:
         return soup.string.replace(u'\xa0', ' ')
     else:
