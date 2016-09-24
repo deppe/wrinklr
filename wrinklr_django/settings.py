@@ -49,6 +49,35 @@ TEMPLATES = [
     },
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'default'
+        },
+    },
+    'formatters': {
+        'default': {
+            'format': '%(levelname)s %(asctime)s %(message)s'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'ERROR'),
+        },
+        'wrinklr': {
+            'handlers': ['console'],
+            'level': os.getenv('WRINKLR_LOG_LEVEL', 'DEBUG' if DEBUG else 'INFO'),
+        },
+    },
+}
+
+import logging.config
+logging.config.dictConfig(LOGGING)
+
 # Application definition
 
 INSTALLED_APPS = (

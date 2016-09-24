@@ -4,8 +4,12 @@
 
 from __future__ import unicode_literals
 
+import sys
+import logging
 import unittest
 import celeb_age as ca
+
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 class TestCelebAge(unittest.TestCase):
     """Unit test class for celeb_age"""

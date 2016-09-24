@@ -3,9 +3,12 @@
 
 import requests
 import re
+import logging
+import pprint
 from string import capwords
 from bs4 import BeautifulSoup
-#from urllib2 import quote
+
+logger = logging.getLogger('wrinklr')
 
 class CelebAgeException(Exception):
     """Generic exception for the celeb_age module"""
@@ -32,6 +35,8 @@ def get_bday(person):
 
     bday = convert_bday_str_to_date(date)
 
+    logger.info('Returning bday %s' % repr(bday))
+
     return bday
 
 def get_person_data(person):
@@ -56,15 +61,16 @@ def get_person_data(person):
     result = requests.get(url, params=request)
 
     final_url = result.url
-    print('Requested data from %s' % final_url)
+    logger.info('Requested data from %s' % final_url)
 
     result = result.json()
 
     if 'error' in result: 
+        logger.error(result['error'])
         raise CelebAgeException(result['error'])
 
     if 'warnings' in result: 
-        print(result['warnings'])
+        logger.warning(result['warnings'])
 
     for page in result['query']['pages'].values():
         try:
@@ -89,9 +95,8 @@ def parse_person_data(markup):
             key, value = [val.strip() for val in matches.groups()]
             if key and value:
                 person_data[unescape_html(key)] = unescape_html(value)
-                #person_data[key] = value
 
-    #import pprint; pprint.pprint(person_data)
+    logger.debug(pprint.pformat(person_data))
     return person_data
 
 def extract_infobox(string):
@@ -149,10 +154,11 @@ def is_roman_numeral(string):
 def convert_bday_str_to_date(bday_string):
     """Extract year, month, day from date string"""
 
-    print('parsing date string: "%s"' % bday_string)
+    logger.debug('Parsing date string: "%s"' % bday_string)
 
     if not bday_string:
         err_str = 'Could not parse date from "%s"' % bday_string
+        logger.warning(err_str)
         raise NoBirthdayException(err_str)
 
     bday_string = re.sub("<.*>", "", bday_string)
@@ -218,7 +224,7 @@ def parse_nonstandard_date(bday_string):
         if matches:
             matches_dict = dict(zip(groups, matches.groups()))
 
-            print('hit: "%s" "%s"' % (expr,  repr(matches.groups())))
+            logger.debug('hit: "%s" "%s"' % (expr,  repr(matches.groups())))
             date = create_date_from_matches(matches_dict)
 
     return date
