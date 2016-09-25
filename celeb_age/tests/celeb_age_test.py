@@ -121,6 +121,20 @@ class TestCelebAge(unittest.TestCase):
         self.assertRaises(ca.NoBirthdayException, parse, 'yyyy-mm-dd')
         self.assertRaises(ca.NoBirthdayException, parse, 'blah 2001 bc')
 
+    def test_roman_numeral(self):
+        irm = ca.is_roman_numeral
+        self.assertTrue(irm('i'))
+        self.assertTrue(irm('v'))
+        self.assertTrue(irm('x'))
+        self.assertTrue(irm('l'))
+        self.assertTrue(irm('c'))
+        self.assertTrue(irm('d'))
+        self.assertTrue(irm('m'))
+        self.assertTrue(irm('civ'))
+        self.assertTrue(irm('ivxmxxiimlcccccddcdcdcdc'))
+        self.assertFalse(irm('adam'))
+        self.assertFalse(irm(''))
+        self.assertFalse(irm('civ2'))
 
 
 if __name__ == '__main__':

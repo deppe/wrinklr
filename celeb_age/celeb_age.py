@@ -148,6 +148,9 @@ def get_name_path(string):
     #return quote(string.encode('utf-8'))
 
 def is_roman_numeral(string):
+    if not string:
+        return False
+
     roman_nums = "ivxlcdm"
     return all(c in roman_nums for c in string)
 
