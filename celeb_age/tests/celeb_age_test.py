@@ -2,12 +2,10 @@
 # -*- coding: utf-8 -*-
 """Test driver for celeb_age.py"""
 
-from __future__ import unicode_literals
-
 import sys
 import logging
 import unittest
-import celeb_age as ca
+from .. import celeb_age as ca
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
