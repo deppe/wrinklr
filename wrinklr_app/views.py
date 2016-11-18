@@ -72,7 +72,10 @@ def matchup(request, matchup_id):
 
     elif request.method == 'GET':
         matchup = get_object_or_404(Matchup, id=matchup_id)
-        user_guess = MatchupGuess.objects.filter(matchup=matchup, user=request.user)
+
+        user_guess = None
+        if not request.user.is_anonymous():
+            user_guess = MatchupGuess.objects.filter(matchup=matchup, user=request.user)
 
         if user_guess:
             return redirect('wrinklr_app:matchup_results', matchup_id=matchup_id)
