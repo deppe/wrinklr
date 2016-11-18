@@ -20,10 +20,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG') == 'True'
 
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
+
+# On login, redirect to root
+LOGIN_REDIRECT_URL = '/wrinklr'
+LOGIN_URL = '/wrinklr/login'
 
 # Templates
 TEMPLATES = [
@@ -87,7 +91,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'wrinklr_app'
+    'wrinklr_app',
+    'django_nose'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -107,10 +112,29 @@ WSGI_APPLICATION = 'wrinklr_django.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
-import dj_database_url
-DATABASES = {
-    'default': dj_database_url.config(default=os.environ['DATABASE_URL'])
-}
+import sys
+TEST = 'test' in sys.argv
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--nocapture',
+    '--nologcapture'
+]
+
+if TEST:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'USER': 'adeppe',
+            'TEST': {
+                'NAME': 'testdb',
+            },
+        },
+    }
+else:
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(default=os.environ['DATABASE_URL'])
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/

@@ -1,9 +1,32 @@
-<form action={% url "wrinklr_app:age" %} method="GET">
-    Celebrity 1:<br>
-    <input type="text" name="celeb1" value="">
+{% extends "wrinklr_app/base.html" %}
+{% block content %}
+
+<form action={% url "wrinklr_app:input_celebs" %} method="POST">
+    {% csrf_token %}
+    Person 1:<br>
+    <input type="text" name="person1" value="{{ person1.name }}">
+    {% if person1 and not person1.valid %}
+    Whoops, could not find person!
+    {% endif %}
     <br>
-    Celebrity 2:<br>
-    <input type="text" name="celeb2" value="">
+    Person 2:<br>
+    <input type="text" name="person2" value="{{ person2.name }}">
+    
+    {% if person2 and not person2.valid %}
+    Whoops, could not find person!
+    {% endif %}
+
     <br><br>
     <input type="submit" value="Submit">
 </form>
+
+<ul>
+{% for matchup in matchups %}
+<li>
+    <a href={% url "wrinklr_app:matchup" matchup.id %}>
+        {{ matchup.person1.name }} vs {{ matchup.person2.name }}
+    </a>
+</li>
+{% endfor %}  
+</ul>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "wrinklr_app/base.html" %}
+{% block content %}
+
+{% load static %}
+<link rel="stylesheet" type="text/css" href={% static "wrinklr_app/matchup.css" %} />
+
+{% if user.is_anonymous %}
+
+Who is older, {{ matchup.person1.name }} or {{ matchup.person2.name }}?
+<br>
+Login to vote!
+
+{% else %}
+
+Who is older?
+<br>
+<form action={% url "wrinklr_app:matchup" matchup.id %} method="POST">
+    {% csrf_token %}
+    <input type="radio" name="guess_person_id" value={{ matchup.person1.id }} checked> {{ matchup.person1.name }}<br>
+    <input type="radio" name="guess_person_id" value={{ matchup.person2.id }}> {{ matchup.person2.name }}<br>
+    <input type="submit" value="Submit!">
+</form>
+
+{% endif %}
+
+<br><br><br><br><br>
+Matchup submitted by {{ matchup.creator }} on {{ matchup.date_created }}.
+
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "wrinklr_app/base.html" %}
+{% block content %}
+
+{{ matchup.person1.name }} {{ matchup.person1.age_str }} <br>
+{{ matchup.person2.name }} {{ matchup.person2.age_str }} <br>
+<b>{{ user_guess.result_str }}</b>
+
+{% endblock %}
