@@ -1,0 +1,8 @@
+# source this file to setup a development environment
+export WRINKLR_DEBUG=TRUE
+export WRINKLR_TEST_DB=TRUE
+export DJANGO_LOG_LEVEL=INFO
+export WRINKLR_LOG_LEVEL=DEBUG
+export DATABASE_URL=postgres://adeppe@localhost/wrinklrdb
+export SECRET_KEY="blahbloo"
+source venv/bin/activate

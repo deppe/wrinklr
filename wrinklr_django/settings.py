@@ -10,8 +10,13 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+import sys
+import logging.config
+import dj_database_url
 
+logger = logging.getLogger('wrinklr')
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -20,7 +25,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG') == 'True'
+DEBUG = os.environ.get('WRINKLR_DEBUG') == 'TRUE'
+
+if DEBUG:
+    logger.info('Running in DEBUG mode')
 
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
@@ -39,8 +47,6 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                # Insert your TEMPLATE_CONTEXT_PROCESSORS here or use this
-                # list if you haven't customized them:
                 'django.contrib.auth.context_processors.auth',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.i18n',
@@ -74,16 +80,14 @@ LOGGING = {
         },
         'wrinklr': {
             'handlers': ['console'],
-            'level': os.getenv('WRINKLR_LOG_LEVEL', 'DEBUG' if DEBUG else 'INFO'),
+            'level': os.getenv('WRINKLR_LOG_LEVEL', 'INFO'),
         },
     },
 }
 
-import logging.config
 logging.config.dictConfig(LOGGING)
 
 # Application definition
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -105,54 +109,40 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'wrinklr_django.urls'
-
 WSGI_APPLICATION = 'wrinklr_django.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-
-import sys
-TEST = 'test' in sys.argv
+# Use nose for tests
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
     '--nocapture',
     '--nologcapture'
 ]
 
-if TEST:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'USER': 'adeppe',
-            'TEST': {
-                'NAME': 'testdb',
-            },
-        },
-    }
+# Database
+# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
+if 'test' in sys.argv:
+    # Test mode, force using a test database
+    db = dj_database_url.parse('postgres://adeppe@localhost/testdb')
 else:
-    import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.config(default=os.environ['DATABASE_URL'])
-    }
+    db = dj_database_url.parse(os.environ['DATABASE_URL'])
+
+DATABASES = {
+    'default': db
+}
+
+logger.info('Using db %s as %s', db['NAME'], db['USER'])
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
