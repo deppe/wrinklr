@@ -1,6 +1,7 @@
 /* Pad body for top nav */
-body {
-    padding-top: 3rem;
+html, body{
+    margin:0px;
+    padding:0px;
 }
 
 .navbar-right {
