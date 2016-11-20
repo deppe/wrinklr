@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.shortcuts import redirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login
@@ -119,6 +118,18 @@ def register(request):
         return redirect('wrinklr_app:input_celebs')
 
     elif request.method == 'GET':
-        form = UserCreationForm()
-        return render(request, 'registration/register.html', {'form': form})
+        context = {
+            'form': UserCreationForm(),
+            'navbar_text': 'Register'
+        }
+        return render(request, 'wrinklr_app/register.html', context)
+
+def navbar_login(request):
+    if request.method == 'GET':
+        if 'login' in request.GET:
+            return redirect('wrinklr_app:login')
+        elif 'register' in request.GET:
+            return redirect('wrinklr_app:register')
+        elif 'logout' in request.GET:
+            return redirect('wrinklr_app:logout')
 

@@ -1,12 +1,11 @@
 {% extends "wrinklr_app/base.html" %}
 {% block content %}
 
-<b>Login</b>
 {% if form.errors %}
-<p>Could not login user. Please try again</p>
+<p>Error creating new user. Please try again.</p>
 {% endif %}
 
-<form method="post" action={% url "wrinklr_app:login" %}>
+<form method="post" action={% url "wrinklr_app:register" %}>
 {% csrf_token %}
 <table>
 <tr>
@@ -14,8 +13,12 @@
     <td>{{ form.username }}</td>
 </tr>
 <tr>
-    <td>{{ form.password.label_tag }}</td>
-    <td>{{ form.password }}</td>
+    <td>{{ form.password1.label_tag }}</td>
+    <td>{{ form.password1 }}</td>
+</tr>
+<tr>
+    <td>{{ form.password2.label_tag }}</td>
+    <td>{{ form.password2 }}</td>
 </tr>
 </table>
 

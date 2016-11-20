@@ -8,7 +8,15 @@ urlpatterns = [
     url(r'^age$', views.age, name='age'),
     url(r'^vs/(?P<matchup_id>[0-9]+)$', views.matchup, name='matchup'),
     url(r'^vs/(?P<matchup_id>[0-9]+)/results$', views.matchup_results, name='matchup_results'),
-    url(r'^login$', login, name='login', kwargs={'redirect_authenticated_user': True}),
-    url(r'^logout$', logout, name='logout'),
+    url(r'^navbar_login$', views.navbar_login, name='navbar_login'),
+    url(r'^login$', 
+        login, 
+        name='login', 
+        kwargs={
+            'redirect_authenticated_user': True,
+            'template_name': 'wrinklr_app/login.html',
+            'extra_context': {'navbar_text': 'Login'}
+        }),
+    url(r'^logout$', logout, name='logout', kwargs={'next_page': '/wrinklr/'}),
     url(r'^register$', views.register, name='register')
 ]
