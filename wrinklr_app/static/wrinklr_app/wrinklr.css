@@ -2,3 +2,7 @@
 body {
     padding-top: 3rem;
 }
+
+.navbar-right {
+    padding-right: 10px;
+}
