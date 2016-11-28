@@ -22,21 +22,22 @@ class TestCelebAge(unittest.TestCase):
         """Test celeb_age.get_bday good input"""
 
         age = get_bday
-        #self.assertEqual((1974, 11, 15), age('chad kroeger'))
-        #self.assertEqual((1935,  1,  8), age('elvis'))
-        #self.assertEqual((1990,  4, 15), age('EMMA WATSON'))
-        #self.assertEqual((-1810, 0,  0), age('hammurabi'))
-        #self.assertEqual((-69,   0,  0), age('Cleopatra'))
-        #self.assertEqual((-4,    0,  0), age('jesus'))
-        #self.assertEqual((1162,  0,  0), age('genghis khan'))
-        #self.assertEqual((1967,  9, 12), age('louis c.k.'))
-        #self.assertEqual((1951,  9,  2), age('mark harmon'))
-        #self.assertEqual((1904,  5, 11), age('salvador dalí'))
-        #self.assertEqual((1757,  1, 11), age('alexander hamilton'))
-        #self.assertEqual((1920,  5, 18), age('pope john paul ii'))
-        #self.assertEqual((1927,  4, 16), age('pope benedict xvi'))
-        #self.assertEqual((1964,  9,  2), age('keanu reeves'))
-        #self.assertEqual((1412,   1,  6), age('joan of arc'))
+        self.assertEqual((1974, 11, 15), age('chad kroeger'))
+        self.assertEqual((1935,  1,  8), age('elvis'))
+        self.assertEqual((1990,  4, 15), age('EMMA WATSON'))
+        self.assertEqual((-1810, 0,  0), age('hammurabi'))
+        self.assertEqual((-69,   0,  0), age('Cleopatra'))
+        self.assertEqual((-4,    0,  0), age('jesus'))
+        self.assertEqual((1162,  0,  0), age('genghis khan'))
+        self.assertEqual((1967,  9, 12), age('louis c.k.'))
+        self.assertEqual((1951,  9,  2), age('mark harmon'))
+        self.assertEqual((1904,  5, 11), age('salvador dalí'))
+        self.assertEqual((1757,  1, 11), age('alexander hamilton'))
+        self.assertEqual((1920,  5, 18), age('pope john paul ii'))
+        self.assertEqual((1927,  4, 16), age('pope benedict xvi'))
+        self.assertEqual((1964,  9,  2), age('keanu reeves'))
+        self.assertEqual((1412,   1,  6), age('joan of arc'))
+        self.assertEqual((1961, 8, 0), age('joseph kony'))
 
     def test_bad_ages(self):
         """Test celeb_age.get_bday bad input"""
@@ -116,6 +117,7 @@ class TestCelebAge(unittest.TestCase):
         self.assertEqual((2001, 0, 0), parse('2001'))
         self.assertEqual((1234, 0, 0), parse('likely 1234'))
         self.assertEqual((-1234, 0, 0), parse('likely 1234 bc'))
+        self.assertEqual((100, 9, 0), parse('September 100 (age 234234)'))
 
     def test_parse_bad_dates(self):
         """Test celeb_age.convert_bday_str_to_date bad input"""
@@ -125,7 +127,6 @@ class TestCelebAge(unittest.TestCase):
         self.assertRaises(NoBirthdayException, parse, '')
         self.assertRaises(NoBirthdayException, parse, None)
         self.assertRaises(NoBirthdayException, parse, 'yyyy-mm-dd')
-        self.assertRaises(NoBirthdayException, parse, 'blah 2001 bc')
 
     def test_roman_numeral(self):
         irm = is_roman_numeral
