@@ -42,27 +42,15 @@ def input_celebs_post(request):
 
 
 def age(request):
-    person1 = Person.get_or_create(request.GET['person1'])
-    person2 = Person.get_or_create(request.GET['person2'])
-    return render_age(request, person1, person2)
+    if 'name' in request.GET:
+        person = Person.create_from_wiki(request.GET['name'])
 
-def render_age(request, person1, person2):
-    person1 = get_celeb_obj(person1)
-    person2 = get_celeb_obj(person2)
-
-    olderStr = "same age"
-    if person1['n_days'] > person2['n_days']:
-        name = person1['name']
-    elif person1['n_days'] < person2['n_days']:
-        name = person2['name']
-
-    olderStr = name + ' is older'
+    if not person:
+        person = Person.init(name='Error')
 
     context = {
-        'celebs': [person1, person2],
-        'older': olderStr
+        'person': person
     }
-
     return render(request, 'wrinklr_app/age.html', context)
 
 def matchup(request, matchup_id):
