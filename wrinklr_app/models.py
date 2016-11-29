@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.core.exceptions import ObjectDoesNotExist
 
 from .celeb_age import get_bday
+from .celeb_age import get_wiki_name_path
 from .celeb_age import NoPersonDataException, NoWikiEntryException, NoBirthdayException
 
 logger = logging.getLogger('wrinklr')
@@ -64,12 +65,26 @@ class Person(models.Model):
     def birth_date_to_list(birth_date):
         return [int(x) for x in birth_date.split(',')]
 
+    # This should be used instead of Person() constructor.
+    # It will properly format the 'name' field
+    @staticmethod
+    def init(**kwargs):
+        name = kwargs.get('name')
+        if name:
+            kwargs['name'] = Person.format_name(name)
+        return Person(**kwargs)
+
+    @staticmethod
+    def format_name(name):
+        return get_wiki_name_path(name, " ")
+
     @staticmethod
     def get_or_create(name):
         person = None
         try:
             #Try to get from db
-            person = Person.objects.get(name = name)
+            name = Person.format_name(name)
+            person = Person.objects.get(name=name)
         except ObjectDoesNotExist:
             #create from wikipedia
             person = Person.create_from_wiki(name)
@@ -79,13 +94,12 @@ class Person(models.Model):
     def create_from_wiki(name):
         try:
             birth_date = get_bday(name)
-            print (birth_date)
         except (NoPersonDataException, NoWikiEntryException, NoBirthdayException):
             logger.warn("Could not find wikipedia page for '%s'", name)
             return None
 
         person = Person(
-            name = name,
+            name = Person.format_name(name),
             birth_date = Person.birth_date_to_str(birth_date)
         )
 

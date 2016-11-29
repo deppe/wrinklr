@@ -11,6 +11,7 @@ from ..models import Person
 from ..models import Matchup
 from ..models import MatchupGuess
 from ..celeb_age import NoWikiEntryException
+from ..celeb_age import get_wiki_name_path
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
@@ -25,40 +26,43 @@ class TestModels(TestCase):
     
     def test_person_birth_date(self):
         def test_date(date):
-            Person(name = "blah", birth_date = date).full_clean()
+            Person.init(name="blah", birth_date=date).full_clean()
+
+        def test_bad_date(date):
+            with self.assertRaises(ValidationError):
+                test_date(date)
 
         #bad dates
-        with self.assertRaises(ValidationError):
-            test_date("")
-            test_date("blah")
-            test_date("1")
-            test_date("1,2")
-            test_date("1,2,")
-            test_date("1,2,3,")
-            test_date("1,2,3,4")
-            test_date("1,2,3,4,5")
-            test_date("1,2a,3")
-            test_date("1.0,2.0,3.0")
+        test_bad_date("")
+        test_bad_date("blah")
+        test_bad_date("1")
+        test_bad_date("1,2")
+        test_bad_date("1,2,")
+        test_bad_date("1,2,3,")
+        test_bad_date("1,2,3,4")
+        test_bad_date("1,2,3,4,5")
+        test_bad_date("1,2a,3")
+        test_bad_date("1.0,2.0,3.0")
 
         #good dates
         test_date("1,2,3")
         test_date("-1,2,3")
 
     def test_fetch_person(self):
-        Person(name = "blah", birth_date="1,2,3").save()
+        Person.init(name="blah", birth_date="1,2,3").save()
         p = Person.get_or_create("blah")
         self.assertEqual(p.birth_date, "1,2,3")
 
     @patch('wrinklr_app.models.get_bday')
     def test_fetch_person_wiki(self, mock_get_bday):
         mock_get_bday.return_value = (1,2,3)
-        p = Person.get_or_create("blah")
-        mock_get_bday.assert_called_once_with("blah")
+        p = Person.get_or_create("blah bloo")
+        mock_get_bday.assert_called_once_with("Blah Bloo")
         self.assertEqual(p.birth_date, "1,2,3")
 
         #Fetch again and get_bday should still only be called once
         p = Person.get_or_create("blah")
-        mock_get_bday.assert_called_once_with("blah")
+        mock_get_bday.assert_called_once_with("Blah")
         self.assertEqual(p.birth_date, "1,2,3")
 
     @patch('wrinklr_app.models.get_bday')
@@ -68,10 +72,10 @@ class TestModels(TestCase):
         self.assertIsNone(p)
 
     def create_basic_matchup(self):
-        p1 = Person(name = "blah1", birth_date="1,1,1")
+        p1 = Person.init(name="blah1", birth_date="1,1,1")
         p1.save()
 
-        p2 = Person(name = "blah2", birth_date="2,2,2")
+        p2 = Person.init(name="blah2", birth_date="2,2,2")
         p2.save()
 
         u = User(username="blah")
@@ -85,9 +89,9 @@ class TestModels(TestCase):
         m, p1, p2, u = self.create_basic_matchup()
 
         def assert_matchup(m):
-            self.assertEqual(m.person1.name, "blah1")
+            self.assertEqual(m.person1.name, "Blah1")
             self.assertEqual(m.person1.birth_date, "1,1,1")
-            self.assertEqual(m.person2.name, "blah2")
+            self.assertEqual(m.person2.name, "Blah2")
             self.assertEqual(m.person2.birth_date, "2,2,2")
             self.assertEqual(m.creator.username, "blah")
 

@@ -5,7 +5,8 @@
 import sys
 import logging
 import unittest
-from ..celeb_age import get_bday, get_name_path
+from django.test import tag
+from ..celeb_age import get_bday, get_wiki_name_path
 from ..celeb_age import unescape_html
 from ..celeb_age import convert_bday_str_to_date
 from ..celeb_age import is_roman_numeral
@@ -53,9 +54,9 @@ class TestCelebAge(unittest.TestCase):
         
 
     def test_wiki_url(self):
-        """Test celeb_age.get_name_path function"""
+        """Test celeb_age.get_wiki_name_path function"""
 
-        path = get_name_path
+        path = get_wiki_name_path
         self.assertEqual('Blah_Bloo',           path('blah bloo'))
         self.assertEqual('Blah_Bloo',           path('   blah   bloo    '))
         self.assertEqual('B',                   path('b'))
@@ -64,6 +65,8 @@ class TestCelebAge(unittest.TestCase):
         self.assertEqual('Portugal._The_Man',   path('portugal. the man'))
         self.assertEqual('Salvador_Dalí',       path('salvador dalí'))
         self.assertEqual('Blah_MVI',            path('blah mvi'))
+
+        self.assertEqual('Blah Bloo',           path('blah bloo', ' '))
 
 
     #def test_parse_person_data(self):

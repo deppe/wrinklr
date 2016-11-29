@@ -49,7 +49,7 @@ def get_person_data(person):
         'format'   : 'json',
         'action'   : 'query',
         'prop'     : 'revisions',
-        'titles'   : get_name_path(person),
+        'titles'   : get_wiki_name_path(person),
         'rvprop'   : 'content',
         'continue' : '',
         'redirects' : '' #necessary to automatically resolve redirects
@@ -129,7 +129,7 @@ def find_infobox_end(string):
 
     raise NoPersonDataException('Malformed input to find_infobox_end' % infobox)
 
-def get_name_path(string):
+def get_wiki_name_path(string, delim='_'):
     """Convert a person name string into a wikipedia path"""
 
     capitalized_words = []
@@ -143,9 +143,8 @@ def get_name_path(string):
         else:
             capitalized_words.append(name.capitalize())
 
-    string = '_'.join(capitalized_words)
+    string = delim.join(capitalized_words)
     return string
-    #return quote(string.encode('utf-8'))
 
 def is_roman_numeral(string):
     if not string:
