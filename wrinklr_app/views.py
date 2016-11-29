@@ -9,15 +9,11 @@ from .models import Person
 from .models import Matchup
 from .models import MatchupGuess
 
-def input_celebs(request, person1=None, person2=None):
+def input_celebs(request):
     if request.method == 'POST':
         return input_celebs_post(request)
     elif request.method == 'GET':
-        context = {
-            'matchups': Matchup.objects.all()
-        }
-
-        return render(request, 'wrinklr_app/input_celebs.html', context)
+        return input_celebs_render(request)
 
 @login_required
 def input_celebs_post(request):
@@ -28,17 +24,32 @@ def input_celebs_post(request):
         def create_dict(n, p):
             return {'name': n, 'valid': bool(p)}
 
-        context = {
-            'person1': create_dict(name1, person1),
-            'person2': create_dict(name2, person2),
-            'matchups': Matchup.objects.all()
-        }
-        return render(request, 'wrinklr_app/input_celebs.html', context)
+        return input_celebs_render(request,
+                                   person1=create_dict(name1, person1), 
+                                   person2=create_dict(name2, person2))
+
     else:
         matchup = Matchup.get_or_create(person1=person1, 
                                         person2=person2, 
                                         creator=request.user)
         return redirect('wrinklr_app:matchup', matchup_id=matchup.id)
+
+def input_celebs_render(request, person1=None, person2=None):
+        guesses = []
+        if not request.user.is_anonymous():
+            guesses = MatchupGuess.objects.filter(user=request.user)
+        open_matchups = Matchup.objects.exclude(id__in=[x.matchup.id for x in guesses])
+
+        context = {
+            'guesses': guesses,
+            'open_matchups': open_matchups,
+            'person1': person1,
+            'person2': person2
+        }
+
+        return render(request, 'wrinklr_app/input_celebs.html', context)
+
+
 
 
 def age(request):

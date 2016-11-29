@@ -20,8 +20,9 @@
     <input type="submit" value="Submit">
 </form>
 
+<h3>Open matchups</h3>
 <ul>
-{% for matchup in matchups %}
+{% for matchup in open_matchups %}
 <li>
     <a href={% url "wrinklr_app:matchup" matchup.id %}>
         {{ matchup.person1.name }} vs {{ matchup.person2.name }}
@@ -29,4 +30,20 @@
 </li>
 {% endfor %}  
 </ul>
+
+
+{% if not user.is_anonymous %}
+<h3>Your guesses</h3>
+<ul class='blah'>
+{% for guess in guesses %}
+<li>
+    <a href={% url "wrinklr_app:matchup" guess.matchup.id %}>
+        {% if guess.result %} &#x2713; {% else %} &#x2717; {% endif %}
+        {{ guess.matchup.person1.name }} vs {{ guess.matchup.person2.name }}
+    </a>
+</li>
+{% endfor %}  
+{% endif %}
+</ul>
+
 {% endblock %}
