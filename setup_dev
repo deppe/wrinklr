@@ -1,8 +1,19 @@
 # source this file to setup a development environment
+
+# Enable debug mode
 export WRINKLR_DEBUG=TRUE
-export WRINKLR_TEST_DB=TRUE
+
+# Set all django logs to INFO
 export DJANGO_LOG_LEVEL=INFO
+
+# Set all app logs to DEBUG
 export WRINKLR_LOG_LEVEL=DEBUG
-export DATABASE_URL=postgres://adeppe@localhost/wrinklrdb
+
+# Local postgres DB. Change wrinklrdb if you have a different db name
+export DATABASE_URL=postgres://localhost/wrinklrdb
+
+# Bogus secret key for local dev only
 export SECRET_KEY="blahbloo"
+
+# Source the python virtual environment
 source venv/bin/activate
