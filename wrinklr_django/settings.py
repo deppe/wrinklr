@@ -115,7 +115,7 @@ NOSE_ARGS = [
 # Database
 if 'test' in sys.argv:
     # Test mode, force using a test database
-    db = dj_database_url.parse('postgres://adeppe@localhost/testdb')
+    db = dj_database_url.parse('postgres://localhost/testdb')
 else:
     db = dj_database_url.parse(os.environ['DATABASE_URL'])
 
