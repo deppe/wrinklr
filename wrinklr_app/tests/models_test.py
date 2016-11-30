@@ -61,8 +61,8 @@ class TestModels(TestCase):
         self.assertEqual(p.birth_date, "1,2,3")
 
         #Fetch again and get_bday should still only be called once
-        p = Person.get_or_create("blah")
-        mock_get_bday.assert_called_once_with("Blah")
+        p = Person.get_or_create("blah bloo")
+        mock_get_bday.assert_called_once_with("Blah Bloo")
         self.assertEqual(p.birth_date, "1,2,3")
 
     @patch('wrinklr_app.models.get_bday')
