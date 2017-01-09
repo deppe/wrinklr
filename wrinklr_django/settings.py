@@ -74,6 +74,15 @@ LOGGING = {
 
 logging.config.dictConfig(LOGGING)
 
+SEARCH_API_KEY = os.environ.get('SEARCH_API_KEY')
+if not SEARCH_API_KEY:
+    _logger.error("Please set a development google api key for testing!")
+
+# TODO: can this be public? I think it can
+SEARCH_API_CONTEXT = os.environ.get('SEARCH_API_CONTEXT')
+if not SEARCH_API_KEY:
+    _logger.error("Please set a development google api context for testing!")
+
 # Application definition
 INSTALLED_APPS = (
     'django.contrib.admin',

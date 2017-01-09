@@ -4,6 +4,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login
+from django.conf import settings
 
 from .models import Person
 from .models import Matchup
@@ -107,6 +108,20 @@ def matchup_results(request, matchup_id):
         }
         return render(request, 'wrinklr_app/matchup_results.html', context)
 
+def image(request):
+
+    context = {
+    }
+    if 'person' in request.GET:
+        import requests
+        key = settings.SEARCH_API_KEY
+        cx = settings.SEARCH_API_CONTEXT
+        q = request.GET['person']
+        url = 'https://www.googleapis.com/customsearch/v1?key=%s&cx=%s&q=%s&searchType=image' % (key, cx, q)
+        result = requests.get(url, params=request)
+        context['image_url'] = result.json()['items'][0]['link']
+    
+    return render(request, 'wrinklr_app/image_search.html', context)
 
 def register(request):
     if request.method == 'POST':

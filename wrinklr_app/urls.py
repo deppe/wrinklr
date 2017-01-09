@@ -18,5 +18,6 @@ urlpatterns = [
             'extra_context': {'navbar_text': 'Login'}
         }),
     url(r'^logout$', logout, name='logout', kwargs={'next_page': '/wrinklr/'}),
-    url(r'^register$', views.register, name='register')
+    url(r'^register$', views.register, name='register'),
+    url(r'^image$', views.image, name='image')
 ]
