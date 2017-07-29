@@ -212,7 +212,7 @@ def parse_nonstandard_date(bday_string):
         (r"^(\w+)\s+(\d+),\s+(\d+)$", ('monthStr', 'day', 'year')),
 
         # 15 January 2001
-        (r"^(\d+)\s+(\w+)\s+(\d+)$", ('day', 'monthStr', 'year')),
+        (r"^(\d+)\s+(\w+)\s+(\d+)\s*(\bBC\b|\bAD\b)?$", ('day', 'monthStr', 'year', 'bc')),
 
         #January, 2001 BC
         (r"^(\w+),?\s+(\d+)\s*(\bBC\b|\bAD\b)?$", ('monthStr', 'year', 'bc')),
