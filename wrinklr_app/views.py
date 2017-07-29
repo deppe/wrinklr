@@ -10,10 +10,13 @@ from django.conf import settings
 from wrinklr_app import slack
 
 import json
+import logging
 
 from .models import Person
 from .models import Matchup
 from .models import MatchupGuess
+
+logger = logging.getLogger('views')
 
 def input_celebs(request):
     if request.method == 'POST':
