@@ -30,7 +30,7 @@ def form_error(text):
 def form_slash_response(matchup):
     return {
         "text": "Who is older?",
-        "type": "in_channel",
+        "response_type": "in_channel",
         "attachments": [{
             "fallback": "You are unable to choose a game",
             "callback_id": create_callback_id(matchup),
