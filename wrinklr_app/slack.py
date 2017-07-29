@@ -55,6 +55,7 @@ def form_action_response(guess, matchup):
 
     return {
         'response_type': 'ephemeral',
+        'replace_original': False,
         'text': '%s!\n%s is %s\n%s is %s'
             % ('Correct' if correct else 'Incorrect', 
                matchup.person1.name, matchup.person1.age_str,
