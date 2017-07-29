@@ -18,5 +18,7 @@ urlpatterns = [
             'extra_context': {'navbar_text': 'Login'}
         }),
     url(r'^logout$', logout, name='logout', kwargs={'next_page': '/wrinklr/'}),
-    url(r'^register$', views.register, name='register')
+    url(r'^register$', views.register, name='register'),
+    url(r'^slack/slash$', views.slack_slash, name='slack_slash'),
+    url(r'^slack/action$', views.slack_action, name='slack_action')
 ]

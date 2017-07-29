@@ -14,6 +14,8 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('WRINKLR_DEBUG') == 'TRUE'
 
+SLACK_OATH_TOKEN = os.environ.get('SLACK_OATH_TOKEN', '')
+
 if DEBUG:
     logger.info('Running in DEBUG mode')
 

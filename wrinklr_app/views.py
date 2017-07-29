@@ -4,6 +4,12 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+from django.conf import settings
+from wrinklr_app import slack
+
+import json
 
 from .models import Person
 from .models import Matchup
@@ -132,3 +138,53 @@ def navbar_login(request):
         elif 'logout' in request.GET:
             return redirect('wrinklr_app:logout')
 
+@csrf_exempt
+def slack_slash(request):
+    if request.method == 'POST':
+        text = request.POST['text']
+        response_url = request.POST['response_url']
+
+        name1, name2 = slack.parse_slash_command(text) 
+
+        if not name1 or not name2:
+            response = slack.form_parse_error(text)
+        else:
+            person1 = Person.get_or_create(name1)
+            person2 = Person.get_or_create(name2)
+
+            err_names = []
+            if not person1: err_names.append(name1)
+            if not person2: err_names.append(name2)
+
+            if err_names:
+                response = slack.form_error_response(err_names)
+            else:
+                # Make slack user in case it doesn't exist
+                user = User.objects.get_or_create(username='slack')[0]
+
+                matchup = Matchup.get_or_create(person1=person1, 
+                                                person2=person2, 
+                                                creator=user)
+                response = slack.form_slash_response(matchup)
+
+        slack.respond_to_url(response_url, response)
+
+        return HttpResponse()
+
+@csrf_exempt
+def slack_action(request):
+    if request.method == 'POST':
+        payload = json.loads(request.POST['payload'])
+        response_url = payload['response_url']
+        callback_id = payload['callback_id']
+        person_id = payload['actions'][0]['value']
+
+        matchup_id = slack.parse_callback_id(callback_id)
+        matchup = Matchup.objects.get(id=matchup_id)
+        guess = Person.objects.get(id=person_id)
+
+        response = slack.form_action_response(guess, matchup)
+        client = slack.SlackClient(settings.SLACK_OATH_TOKEN)
+        client.respond_to_url(response_url, response)
+
+    return HttpResponse()
