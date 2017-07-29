@@ -17,6 +17,7 @@ from .models import Matchup
 from .models import MatchupGuess
 
 logger = logging.getLogger('views')
+_client = slack.Client(settings.SLACK_OATH_TOKEN)
 
 def input_celebs(request):
     if request.method == 'POST':
@@ -180,15 +181,25 @@ def slack_action(request):
     if request.method == 'POST':
         logger.info(request.POST)
         payload = json.loads(request.POST['payload'])
+
         response_url = payload['response_url']
         callback_id = payload['callback_id']
+        channel_id = payload['channel']['id']
+        message_ts = payload['message_ts']
+        thread_ts = payload['original_message'].get('thread_ts')
+        user = payload['user']['name']
         person_id = payload['actions'][0]['value']
 
         matchup_id = slack.parse_callback_id(callback_id)
         matchup = Matchup.objects.get(id=matchup_id)
         guess = Person.objects.get(id=person_id)
 
-        response = slack.form_action_response(guess, matchup)
-        slack.respond_to_url(response_url, response)
+        if not thread_ts:
+            # First response, add the solution
+            text = slack.get_solution_text(matchup)
+            _client.send_thread_message(text, channel_id, message_ts)
+
+        text = slack.get_user_guess_text(user, guess, matchup)
+        _client.send_thread_message(text, channel_id, message_ts)
 
     return HttpResponse()

@@ -2,6 +2,7 @@ import re
 import requests
 import logging
 import json
+import slackclient
 
 logger = logging.getLogger('slack')
 
@@ -32,7 +33,7 @@ def form_slash_response(matchup):
         "text": "Who is older?",
         "response_type": "in_channel",
         "attachments": [{
-            "fallback": "You are unable to choose a game",
+            "fallback": "",
             "callback_id": create_callback_id(matchup),
             "color": "#3AA3E3",
             "attachment_type": "default",
@@ -50,17 +51,17 @@ def form_slash_response(matchup):
         }]
     }
 
-def form_action_response(guess, matchup):
-    correct = guess == matchup.older
+def get_solution_text(matchup):
+    return '%s is %s\n%s is %s' % (matchup.person1.name, 
+                                   matchup.person1.age_str,
+                                   matchup.person2.name,
+                                   matchup.person2.age_str)
 
-    return {
-        'response_type': 'ephemeral',
-        'replace_original': False,
-        'text': '%s!\n%s is %s\n%s is %s'
-            % ('Correct' if correct else 'Incorrect', 
-               matchup.person1.name, matchup.person1.age_str,
-               matchup.person2.name, matchup.person2.age_str)
-    }
+def get_user_guess_text(user, guess, matchup):
+    correct = guess == matchup.older
+    return '%s guessed %s. %s!' % (user, 
+                                   guess.name, 
+                                   'Correct' if correct else 'Incorrect')
 
 def create_callback_id(matchup):
     return json.dumps({
@@ -80,3 +81,12 @@ def respond_to_url(url, data):
     result = requests.post(url, json=data, headers=headers)
     result.raise_for_status()
 
+class Client(object):
+    def __init__(self, token):
+        self.client = slackclient.SlackClient(token)
+
+    def send_thread_message(self, text, channel, thread_ts):
+        rc = self.client.api_call('chat.postMessage',
+                             text=text,
+                             channel=channel,
+                             thread_ts=thread_ts)
