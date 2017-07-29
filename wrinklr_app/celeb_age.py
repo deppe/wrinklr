@@ -200,7 +200,7 @@ def parse_standard_date(bday_string):
 def parse_nonstandard_date(bday_string):
     bday_string = re.sub(r"(c\.|likely|\(age \d+\))", "", bday_string, flags=re.IGNORECASE).strip()
 
-    bday_string = re.sub(r"\{\{efn.*", "", bday_string, flags=re.IGNORECASE).strip()
+    bday_string = re.sub(r"\{\{(efn|sfn|notelist|reflist|citation).*", "", bday_string, flags=re.IGNORECASE).strip()
     bday_string = re.sub(r"\<ref.*", "", bday_string, flags=re.IGNORECASE).strip()
     bday_string = re.sub(r"(\{\{|\}\})", "", bday_string).strip()
 
