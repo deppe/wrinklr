@@ -186,20 +186,24 @@ def slack_action(request):
         callback_id = payload['callback_id']
         channel_id = payload['channel']['id']
         message_ts = payload['message_ts']
-        thread_ts = payload['original_message'].get('thread_ts')
+        original_msg = payload['original_message']
+        thread_ts = original_msg.get('thread_ts')
         user = payload['user']['name']
         person_id = payload['actions'][0]['value']
-
+        
         matchup_id = slack.parse_callback_id(callback_id)
         matchup = Matchup.objects.get(id=matchup_id)
         guess = Person.objects.get(id=person_id)
 
-        if not thread_ts:
-            # First response, add the solution
-            text = slack.get_solution_text(matchup)
-            _client.send_thread_message(text, channel_id, message_ts)
+        footer = slack.update_footer(original_msg, user, guess, matchup)
 
-        text = slack.get_user_guess_text(user, guess, matchup)
-        _client.send_thread_message(text, channel_id, message_ts)
+        if footer:
+            response = slack.form_slash_response(matchup, footer)
+            slack.respond_to_url(response_url, response)
+
+            if not thread_ts:
+                # First response, add the solution
+                text = slack.get_solution_text(matchup)
+                _client.send_thread_message(text, channel_id, message_ts)
 
     return HttpResponse()

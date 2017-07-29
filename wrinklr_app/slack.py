@@ -28,7 +28,7 @@ def form_error(text):
         "text": text
     }
 
-def form_slash_response(matchup):
+def form_slash_response(matchup, footer = ""):
     return {
         "text": "Who is older?",
         "response_type": "in_channel",
@@ -37,6 +37,7 @@ def form_slash_response(matchup):
             "callback_id": create_callback_id(matchup),
             "color": "#3AA3E3",
             "attachment_type": "default",
+            "footer": footer,
             "actions": [{
                 "name": "person1",
                 "text": matchup.person1.name,
@@ -74,6 +75,22 @@ def parse_callback_id(callback_id):
     if data['type'] == 'wrinklr_choice':
         return data['matchup_id']
     return None
+
+def update_footer(msg, user, guess, matchup):
+    correct = guess == matchup.older
+    sym = '✔' if correct else '✖'
+    new_line = '%s %s' % (sym, user)
+
+    footer = msg['attachments'][0].get('footer')
+    if footer:
+        if user in footer:
+            return None
+        footer += '\n' + new_line
+    else:
+        footer = new_line
+
+    return footer
+
 
 def respond_to_url(url, data):
     logger.info('posting %s to %s' % (data, url))
