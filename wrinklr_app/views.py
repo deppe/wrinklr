@@ -184,7 +184,6 @@ def slack_action(request):
         guess = Person.objects.get(id=person_id)
 
         response = slack.form_action_response(guess, matchup)
-        client = slack.SlackClient(settings.SLACK_OATH_TOKEN)
-        client.respond_to_url(response_url, response)
+        slack.respond_to_url(response_url, response)
 
     return HttpResponse()
