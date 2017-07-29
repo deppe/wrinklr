@@ -42,7 +42,7 @@ class TestCelebAge(unittest.TestCase):
         self.assertEqual((1927,  4, 16), age('pope benedict xvi'))
         self.assertEqual((1964,  9,  2), age('keanu reeves'))
         self.assertEqual((1412,  1,  6), age('joan of arc'))
-        self.assertEqual((1961,  8,  0), age('joseph kony'))
+        self.assertEqual((1961,  8, 16), age('joseph kony'))
 
     def test_bad_ages(self):
         """Test celeb_age.get_bday bad input"""
@@ -113,18 +113,25 @@ class TestCelebAge(unittest.TestCase):
 
         parse = convert_bday_str_to_date
 
-        self.assertEqual((1987, 9, 9), parse('1987-09-09'))
-        self.assertEqual((-49, 0, 0),  parse('c. 49 BC'))
-        self.assertEqual((49, 0, 0),   parse('49 AD'))
-        self.assertEqual((-100, 1, 0), parse('January, 100 BC'))
-        self.assertEqual((-300, 0, 0), parse('3rd century BC'))
-        self.assertEqual((-300, 0, 0), parse('3rd CentuRY bc'))
-        self.assertEqual((1, 0, 0),    parse('1st century'))
-        self.assertEqual((1162, 0, 0), parse('c. 1162'))
-        self.assertEqual((2001, 0, 0), parse('2001'))
-        self.assertEqual((1234, 0, 0), parse('likely 1234'))
+        self.assertEqual((1987, 9, 9),  parse('1987-09-09'))
+        self.assertEqual((-49, 0, 0),   parse('c. 49 BC'))
+        self.assertEqual((49, 0, 0),    parse('49 AD'))
+        self.assertEqual((-100, 1, 0),  parse('January, 100 BC'))
+        self.assertEqual((-100, 1, 15), parse('15 January 100 BC'))
+        self.assertEqual((100, 1, 15),  parse('15 January 100'))
+        self.assertEqual((-100, 1, 15), parse('15 January BC 100'))
+        self.assertEqual((-300, 0, 0),  parse('3rd century BC'))
+        self.assertEqual((-300, 0, 0),  parse('3rd CentuRY bc'))
+        self.assertEqual((1, 0, 0),     parse('1st century'))
+        self.assertEqual((1162, 0, 0),  parse('c. 1162'))
+        self.assertEqual((2001, 0, 0),  parse('2001'))
+        self.assertEqual((1234, 0, 0),  parse('likely 1234'))
         self.assertEqual((-1234, 0, 0), parse('likely 1234 bc'))
-        self.assertEqual((100, 9, 0), parse('September 100 (age 234234)'))
+        self.assertEqual((100, 9, 0),   parse('September 100 (age 234234)'))
+        self.assertEqual((1, 2, 3),     parse('{{blah|1|2|3}}'))
+        self.assertEqual((1, 2, 3),     parse('{{blah|1|2|3|4}}'))
+        self.assertEqual((50, 8, 15),   parse('blah|15 August 50{{efn blah bloo}}'))
+        self.assertEqual((50, 8, 15),   parse('blah|15 August 50<ref blah bloo\>'))
 
     def test_parse_bad_dates(self):
         """Test celeb_age.convert_bday_str_to_date bad input"""
