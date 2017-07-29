@@ -192,7 +192,9 @@ def parse_standard_date(bday_string):
 
     date = filter(is_int, bday_string.split('|'))
     date = tuple(map(int, date))
-        
+
+    if len(date) > 3:
+        return date[:3]
     return date
 
 def parse_nonstandard_date(bday_string):

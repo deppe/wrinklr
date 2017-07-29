@@ -23,6 +23,7 @@ class TestCelebAge(unittest.TestCase):
         """Test celeb_age.get_bday good input"""
 
         age = get_bday
+        self.assertEqual((1965,  9, 25), age('scottie pippen'))
         self.assertEqual((1974, 11, 15), age('chad kroeger'))
         self.assertEqual((1935,  1,  8), age('elvis'))
         self.assertEqual((1990,  4, 15), age('EMMA WATSON'))
