@@ -4,7 +4,7 @@ import logging
 import json
 import slackclient
 
-logger = logging.getLogger('slack')
+logger = logging.getLogger('wrinklr')
 
 def parse_slash_command(text):
     match = re.match('^(.*)vs(.*)$', text)
