@@ -141,6 +141,7 @@ def navbar_login(request):
 @csrf_exempt
 def slack_slash(request):
     if request.method == 'POST':
+        logger.info(request.POST)
         text = request.POST['text']
         response_url = request.POST['response_url']
 
@@ -174,6 +175,7 @@ def slack_slash(request):
 @csrf_exempt
 def slack_action(request):
     if request.method == 'POST':
+        logger.info(request.POST)
         payload = json.loads(request.POST['payload'])
         response_url = payload['response_url']
         callback_id = payload['callback_id']
