@@ -176,7 +176,7 @@ def convert_bday_str_to_date(bday_string):
     return date
 
 def parse_standard_date(bday_string):
-    match = re.match("^\{\{(.*)\}\}$", bday_string)
+    match = re.match("^\{\{(.*)\}\}.*$", bday_string)
 
     if not match:
         return
@@ -197,6 +197,10 @@ def parse_standard_date(bday_string):
 
 def parse_nonstandard_date(bday_string):
     bday_string = re.sub(r"(c\.|likely|\(age \d+\))", "", bday_string, flags=re.IGNORECASE).strip()
+
+    bday_string = re.sub(r"\{\{efn.*", "", bday_string, flags=re.IGNORECASE).strip()
+    bday_string = re.sub(r"\<ref.*", "", bday_string, flags=re.IGNORECASE).strip()
+    bday_string = re.sub(r"(\{\{|\}\})", "", bday_string).strip()
 
     regex = {
         #'2001-01-15'
@@ -219,15 +223,18 @@ def parse_nonstandard_date(bday_string):
         (r"^([0-9])+..\s+century\s*(\bBC\b|\bAD\b)?$", ('century', 'bc'))
     }
 
-    date = None
-    for expr, groups in regex:
-        matches = re.search(expr, bday_string, flags=re.IGNORECASE)
+    tokens = bday_string.split('|')
 
-        if matches:
-            matches_dict = dict(zip(groups, matches.groups()))
+    for token in tokens:
+        date = None
+        for expr, groups in regex:
+            matches = re.search(expr, token, flags=re.IGNORECASE)
 
-            logger.debug('hit: "%s" "%s"' % (expr,  repr(matches.groups())))
-            date = create_date_from_matches(matches_dict)
+            if matches:
+                matches_dict = dict(zip(groups, matches.groups()))
+
+                logger.debug('hit: "%s" "%s"' % (expr,  repr(matches.groups())))
+                date = create_date_from_matches(matches_dict)
 
     return date
 

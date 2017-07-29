@@ -40,7 +40,7 @@ class Person(models.Model):
 
     def _age_str(self):
         birth_date = Person.birth_date_to_list(self.birth_date)
-        return str(int(self.age_in_days/365)) + ' years old (born ' +  str(birth_date) + ')'
+        return str(int(self.age_in_days/365)) + ' years old (born ' +  Person.birth_date_to_formatted_str(birth_date) + ')'
 
     # Derived properties
     age_in_days = property(_age_in_days)
@@ -60,6 +60,10 @@ class Person(models.Model):
     @staticmethod
     def birth_date_to_str(birth_date):
         return ','.join(map(str, birth_date))
+
+    @staticmethod
+    def birth_date_to_formatted_str(birth_date):
+        return '/'.join(map(str, [birth_date[1], birth_date[2], birth_date[0]]))
 
     @staticmethod
     def birth_date_to_list(birth_date):

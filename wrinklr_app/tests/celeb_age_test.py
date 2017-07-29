@@ -33,7 +33,7 @@ class TestCelebAge(unittest.TestCase):
         self.assertEqual((1967,  9, 12), age('louis c.k.'))
         self.assertEqual((1951,  9,  2), age('mark harmon'))
         self.assertEqual((1904,  5, 11), age('salvador dalí'))
-        self.assertEqual((1757,  1, 11), age('alexander hamilton'))
+        self.assertEqual((1755,  1, 11), age('alexander hamilton'))
         self.assertEqual((1920,  5, 18), age('pope john paul ii'))
         self.assertEqual((1927,  4, 16), age('pope benedict xvi'))
         self.assertEqual((1964,  9,  2), age('keanu reeves'))

@@ -65,6 +65,11 @@ class TestModels(TestCase):
         mock_get_bday.assert_called_once_with("Blah Bloo")
         self.assertEqual(p.birth_date, "1,2,3")
 
+    def test_person_birthdate_formatters(self):
+        self.assertEqual(Person.birth_date_to_list("1,2,3"), [1,2,3])
+        self.assertEqual(Person.birth_date_to_str([1,2,3]), "1,2,3")
+        self.assertEqual(Person.birth_date_to_formatted_str([1,2,3]), "2/3/1")
+
     @patch('wrinklr_app.models.get_bday')
     def test_fetch_person_no_wiki(self, mock_get_bday):
         mock_get_bday.side_effect = NoWikiEntryException
