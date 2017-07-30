@@ -23,6 +23,7 @@ class TestCelebAge(unittest.TestCase):
         """Test celeb_age.get_bday good input"""
 
         age = get_bday
+        self.assertEqual((-563,  0,  0), age('buddha'))
         self.assertEqual((-100,  7, 13), age('julius caesar'))
         self.assertEqual((12,    8, 31), age('caligula'))
         self.assertEqual((742,   4,  2), age('charlemagne'))
@@ -42,7 +43,7 @@ class TestCelebAge(unittest.TestCase):
         self.assertEqual((1927,  4, 16), age('pope benedict xvi'))
         self.assertEqual((1964,  9,  2), age('keanu reeves'))
         self.assertEqual((1412,  1,  6), age('joan of arc'))
-        self.assertEqual((1961,  8, 16), age('joseph kony'))
+        self.assertEqual((1961,  0,  0), age('joseph kony'))
 
     def test_bad_ages(self):
         """Test celeb_age.get_bday bad input"""
@@ -132,6 +133,7 @@ class TestCelebAge(unittest.TestCase):
         self.assertEqual((1, 2, 3),     parse('{{blah|1|2|3|4}}'))
         self.assertEqual((50, 8, 15),   parse('blah|15 August 50{{efn blah bloo}}'))
         self.assertEqual((50, 8, 15),   parse('blah|15 August 50<ref blah bloo\>'))
+        self.assertEqual((-563, 0, 0),  parse('c. 563 BCE or c. 480 BCE{{sfn|Cousins|1996'))
 
     def test_parse_bad_dates(self):
         """Test celeb_age.convert_bday_str_to_date bad input"""

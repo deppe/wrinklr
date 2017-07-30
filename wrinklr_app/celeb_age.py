@@ -193,9 +193,8 @@ def parse_standard_date(bday_string):
     date = filter(is_int, bday_string.split('|'))
     date = tuple(map(int, date))
 
-    if len(date) > 3:
-        return date[:3]
-    return date
+    date += (0, 0)
+    return date[:3]
 
 def parse_nonstandard_date(bday_string):
     bday_string = re.sub(r"(c\.|likely|\(age \d+\))", "", bday_string, flags=re.IGNORECASE).strip()
@@ -203,6 +202,7 @@ def parse_nonstandard_date(bday_string):
     bday_string = re.sub(r"\{\{(efn|sfn|notelist|reflist|citation).*", "", bday_string, flags=re.IGNORECASE).strip()
     bday_string = re.sub(r"\<ref.*", "", bday_string, flags=re.IGNORECASE).strip()
     bday_string = re.sub(r"(\{\{|\}\})", "", bday_string).strip()
+    bday_string = re.sub(r" or .*", "", bday_string).strip()
 
     regex = {
         #'2001-01-15'
@@ -222,7 +222,7 @@ def parse_nonstandard_date(bday_string):
 
         #c. 2001 BC
         #likely 2001 BC
-        (r"^([0-9]+)\s*(\bBC\b|\bAD\b)?$", ('year', 'bc')),
+        (r"^([0-9]+)\s*(\bBC\b|\bAD\b|\bBCE\b)?$", ('year', 'bc')),
 
         #2001st cenutury BC
         (r"^([0-9])+..\s+century\s*(\bBC\b|\bAD\b)?$", ('century', 'bc'))
@@ -273,7 +273,7 @@ def get_year(matches):
     era = matches.get('bc', '')
     century = matches.get('century')
 
-    is_bc = era and era.upper() == 'BC'
+    is_bc = era and era.upper()[:2] == 'BC'
 
     if century:
         if is_bc:
