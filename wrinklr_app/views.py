@@ -171,7 +171,7 @@ def slack_slash(request):
                 matchup = Matchup.get_or_create(person1=person1, 
                                                 person2=person2, 
                                                 creator=user)
-                footer = 'Created by ' + username
+                footer = 'Created by %s.' % username
                 response = slack.form_slash_response(matchup, '', footer)
 
         slack.respond_to_url(response_url, response)
@@ -199,6 +199,8 @@ def slack_action(request):
 
         results = slack.update_results(original_msg, user, guess, matchup)
         footer = original_msg['attachments'][2]['footer']
+        if 'Spoilers' not in footer:
+            footer += ' Spoilers in thread below.'
 
         if results:
             response = slack.form_slash_response(matchup, results, footer)
