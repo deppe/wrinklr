@@ -60,8 +60,6 @@ def input_celebs_render(request, person1=None, person2=None):
         return render(request, 'wrinklr_app/input_celebs.html', context)
 
 
-
-
 def age(request):
     if 'name' in request.GET:
         person = Person.create_from_wiki(request.GET['name'])
@@ -199,8 +197,9 @@ def slack_action(request):
 
         results = slack.update_results(original_msg, user, guess, matchup)
         footer = original_msg['attachments'][2]['footer']
-        if 'Spoilers' not in footer:
-            footer += ' Spoilers in thread below.'
+        spoiler = ' Spoilers in thread below.'
+        if spoiler not in footer:
+            footer += spoiler
 
         if results:
             response = slack.form_slash_response(matchup, results, footer)
