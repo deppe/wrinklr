@@ -16,7 +16,7 @@ from .models import Person
 from .models import Matchup
 from .models import MatchupGuess
 
-logger = logging.getLogger('views')
+logger = logging.getLogger('wrinklr')
 _client = slack.Client(settings.SLACK_OATH_TOKEN)
 
 def input_celebs(request):
@@ -148,6 +148,7 @@ def slack_slash(request):
         logger.info(request.POST)
         text = request.POST['text']
         response_url = request.POST['response_url']
+        username = request.POST['user_name']
 
         name1, name2 = slack.parse_slash_command(text) 
 
@@ -170,7 +171,8 @@ def slack_slash(request):
                 matchup = Matchup.get_or_create(person1=person1, 
                                                 person2=person2, 
                                                 creator=user)
-                response = slack.form_slash_response(matchup)
+                footer = 'Created by ' + username
+                response = slack.form_slash_response(matchup, '', footer)
 
         slack.respond_to_url(response_url, response)
 
@@ -195,10 +197,11 @@ def slack_action(request):
         matchup = Matchup.objects.get(id=matchup_id)
         guess = Person.objects.get(id=person_id)
 
-        footer = slack.update_footer(original_msg, user, guess, matchup)
+        results = slack.update_results(original_msg, user, guess, matchup)
+        footer = original_msg['attachments'][2]['footer']
 
-        if footer:
-            response = slack.form_slash_response(matchup, footer)
+        if results:
+            response = slack.form_slash_response(matchup, results, footer)
             slack.respond_to_url(response_url, response)
 
             if not thread_ts:

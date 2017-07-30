@@ -28,16 +28,16 @@ def form_error(text):
         "text": text
     }
 
-def form_slash_response(matchup, footer = ""):
+def form_slash_response(matchup, results, footer):
     return {
         "text": "Who is older?",
         "response_type": "in_channel",
-        "attachments": [{
+        "attachments": [
+        {
             "fallback": "",
             "callback_id": create_callback_id(matchup),
             "color": "#3AA3E3",
             "attachment_type": "default",
-            "footer": footer,
             "actions": [{
                 "name": "person1",
                 "text": matchup.person1.name,
@@ -49,6 +49,20 @@ def form_slash_response(matchup, footer = ""):
                 "type": "button",
                 "value": matchup.person2.id
             }]
+        }, 
+        {
+            "fallback": "",
+            "callback_id": "",
+            "color": "#9AA3E3",
+            "attachment_type": "default",
+            "footer": results,
+        },
+        {
+            "fallback": "",
+            "callback_id": "",
+            "color": "#AA0000",
+            "attachment_type": "default",
+            "footer": footer,
         }]
     }
 
@@ -76,20 +90,20 @@ def parse_callback_id(callback_id):
         return data['matchup_id']
     return None
 
-def update_footer(msg, user, guess, matchup):
+def update_results(msg, user, guess, matchup):
     correct = guess == matchup.older
     sym = '✔' if correct else '✖'
     new_line = '%s %s' % (sym, user)
 
-    footer = msg['attachments'][0].get('footer')
-    if footer:
-        if user in footer:
+    results = msg['attachments'][1].get('footer')
+    if results:
+        if user in results:
             return None
-        footer += '\n' + new_line
+        results += '\n' + new_line
     else:
-        footer = new_line
+        results = new_line
 
-    return footer
+    return results
 
 
 def respond_to_url(url, data):
