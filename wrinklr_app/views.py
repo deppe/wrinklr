@@ -211,3 +211,6 @@ def slack_action(request):
                 _client.send_thread_message(text, channel_id, message_ts)
 
     return HttpResponse()
+
+def ping(request):
+    return HttpResponse()
